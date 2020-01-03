@@ -1,0 +1,20 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.define "masteransible", primary: true do |cfg|
+        cfg.vm.box="centos/7"
+        cfg.vm.network "forwarded_port", guest:80,host:8898, auto_correct: true
+        cfg.vm.provision "ansible" do |ansible|
+	    ansible.playbook="ansible/startup.yml"
+	    ansible.sudo=true
+	end
+
+        cfg.vm.provider "virtualbox" do |vbox|
+            vbox.memory=1024
+            vbox.cpus=1
+        end
+    end
+    
+    
+end

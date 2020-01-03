@@ -1,6 +1,22 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+$nginx_install = <<SCRIPT
+    if [ ! -x /usr/sbin/nginx ]; then
+        mv /tmp/nginx.repo /etc/yum.repos.d/nginx.repo;  
+        yum update & yum install -y nginx; 
+        mkdir /etc/nginx/conf;
+        mv /tmp/default.conf /etc/nginx/conf.d/; 
+        mv /tmp/location.conf /etc/nginx/conf/;
+        ln -s /opt/vagrantsite /usr/share/nginx/html/; 
+        semodule -i /tmp/nginx.pp ;
+        rm /tmp/*.conf
+        rm /tmp/*.pp 
+    fi;
+    service nginx start;
+    echo start nginx;
+SCRIPT
+
 Vagrant.configure("2") do |config|
     config.vm.define "master", primary: true do |cfg|
         cfg.vm.box="centos/7"
@@ -10,7 +26,7 @@ Vagrant.configure("2") do |config|
         cfg.vm.provision "file", source: "./nginx/default.conf", destination: "/tmp/default.conf"
         cfg.vm.provision "file", source: "./nginx/location.conf", destination: "/tmp/location.conf"
         cfg.vm.provision "file", source: "./nginx/nginx.pp", destination: "/tmp/nginx.pp"
-        cfg.vm.provision "shell", inline: "mv /tmp/nginx.repo /etc/yum.repos.d/nginx.repo;  yum update & yum install -y nginx; mkdir /etc/nginx/conf; mv /tmp/default.conf /etc/nginx/conf.d/; mv /tmp/location.conf /etc/nginx/conf/; ln -s /opt/vagrantsite /usr/share/nginx/html/; semodule -i /tmp/nginx.pp ; service nginx start "
+        cfg.vm.provision "shell", inline: $nginx_install
 
         cfg.vm.provider "virtualbox" do |vbox|
             vbox.memory=1024
