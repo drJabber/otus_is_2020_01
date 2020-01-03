@@ -1,0 +1,22 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+    config.vm.define "master", primary: true do |cfg|
+        cfg.vm.box="centos/7"
+        cfg.vm.network "forwarded_port", guest:80,host:8888, auto_correct: true
+        cfg.vm.synced_folder "./vagrantsite/", "/opt/vagrantsite"
+        cfg.vm.provision "file", source: "./nginx/nginx.repo", destination: "/tmp/nginx.repo"
+        cfg.vm.provision "file", source: "./nginx/default.conf", destination: "/tmp/default.conf"
+        cfg.vm.provision "file", source: "./nginx/location.conf", destination: "/tmp/location.conf"
+        cfg.vm.provision "file", source: "./nginx/nginx.pp", destination: "/tmp/nginx.pp"
+        cfg.vm.provision "shell", inline: "mv /tmp/nginx.repo /etc/yum.repos.d/nginx.repo;  yum update & yum install -y nginx; mkdir /etc/nginx/conf; mv /tmp/default.conf /etc/nginx/conf.d/; mv /tmp/location.conf /etc/nginx/conf/; ln -s /opt/vagrantsite /usr/share/nginx/html/; semodule -i /tmp/nginx.pp ; service nginx start "
+
+        cfg.vm.provider "virtualbox" do |vbox|
+            vbox.memory=1024
+            vbox.cpus=1
+        end
+    end
+    
+    
+end
