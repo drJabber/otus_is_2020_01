@@ -1,0 +1,21 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$my_ip="192.168.99.100"
+$my_host="masterpn.local"
+
+Vagrant.configure("2") do |config|
+    config.vm.define "masterpn", primary: true do |cfg|
+        cfg.vm.box="centos/7"
+        cfg.vm.network "private_network", ip: $my_ip
+
+        cfg.vm.provision :hosts do |hosts| 
+            hosts.add_host $my_ip, [$my_host]
+        end
+
+        cfg.vm.provider "virtualbox" do |vbox|
+            vbox.memory=1024
+            vbox.cpus=1
+        end
+    end
+end
