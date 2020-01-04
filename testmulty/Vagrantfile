@@ -1,0 +1,42 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+$db_ip="192.168.99.100"
+$db_host="db.local"
+
+$web_ip="192.168.99.101"
+$web_host="web.local"
+
+Vagrant.configure("2") do |config|
+    config.vm.define "database", primary: true do |db|
+        db.vm.box="centos/7"
+        db.vm.hostname=$db_host
+        db.vm.network "private_network", ip: $db_ip
+
+        db.vm.provision :hosts do |hosts| 
+            hosts.add_host $db_ip, [$db_host]
+            hosts.add_host $web_ip, [$web_host]
+        end
+
+        db.vm.provider "virtualbox" do |vbox|
+            vbox.memory=1024
+            vbox.cpus=1
+        end
+    end
+
+    config.vm.define "web", primary: true do |web|
+        web.vm.box="centos/7"
+        web.vm.hostname=$web_host
+        web.vm.network "private_network", ip: $web_ip
+
+        web.vm.provision :hosts do |hosts| 
+            hosts.add_host $db_ip, [$db_host]
+            hosts.add_host $web_ip, [$web_host]
+        end
+
+        web.vm.provider "virtualbox" do |vbox|
+            vbox.memory=1024
+            vbox.cpus=1
+        end
+    end
+end
