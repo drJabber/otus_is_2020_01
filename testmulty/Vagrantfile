@@ -1,42 +1,78 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
-$db_ip="192.168.99.100"
-$db_host="db.local"
+$n1_ip1="192.168.99.100"
+$n1_host="node1.local"
 
-$web_ip="192.168.99.101"
-$web_host="web.local"
+$n2_ip1="192.168.99.101"
+$n2_ip2="172.16.99.101"
+$n2_host="node2.local"
+
+$n3_ip1="192.168.99.102"
+$n3_ip2="172.16.99.102"
+$n3_host="node3.local"
+
+bootstrap = <<SCRIPT
+  useradd -m testuser1; echo -e "testtest\ntesttest" | passwd testuser1
+SCRIPT
 
 Vagrant.configure("2") do |config|
-    config.vm.define "database", primary: true do |db|
-        db.vm.box="centos/7"
-        db.vm.hostname=$db_host
-        db.vm.network "private_network", ip: $db_ip
+    config.vm.define "node1", primary: true do |n1|
+        n1.vm.box="centos/7"
+        n1.vm.hostname=$n1_host
+        n1.vm.network "private_network", ip: $n1_ip1
 
-        db.vm.provision :hosts do |hosts| 
-            hosts.add_host $db_ip, [$db_host]
-            hosts.add_host $web_ip, [$web_host]
+        n1.vm.provision :hosts do |hosts| 
+            hosts.add_host $n1_ip1, [$n1_host]
+            hosts.add_host $n2_ip1, [$n2_host]
+            hosts.add_host $n3_ip1, [$n3_host]
         end
 
-        db.vm.provider "virtualbox" do |vbox|
+        n1.vm.provision "shell", inline: "#{bootstrap}", privileged: true
+
+        n1.vm.provider "virtualbox" do |vbox|
             vbox.memory=1024
             vbox.cpus=1
         end
     end
 
-    config.vm.define "web", primary: true do |web|
-        web.vm.box="centos/7"
-        web.vm.hostname=$web_host
-        web.vm.network "private_network", ip: $web_ip
+    config.vm.define "node2", primary: true do |n2|
+        n2.vm.box="centos/7"
+        n2.vm.hostname=$n2_host
+        n2.vm.network "private_network", ip: $n2_ip1
+        n2.vm.network "private_network", ip: $n2_ip2, virtualbox__intnet: "remotenw"
 
-        web.vm.provision :hosts do |hosts| 
-            hosts.add_host $db_ip, [$db_host]
-            hosts.add_host $web_ip, [$web_host]
+        n2.vm.provision :hosts do |hosts| 
+            hosts.add_host $n1_ip1, [$n1_host]
+            hosts.add_host $n2_ip1, [$n2_host]
+            hosts.add_host $n3_ip1, [$n3_host]
         end
 
-        web.vm.provider "virtualbox" do |vbox|
+        n2.vm.provision "shell", inline: "#{bootstrap}", privileged: true
+
+        n2.vm.provider "virtualbox" do |vbox|
             vbox.memory=1024
             vbox.cpus=1
         end
     end
+
+    config.vm.define "node3", primary: true do |n3|
+        n3.vm.box="centos/7"
+        n3.vm.hostname=$n3_host
+        #n3.vm.network "private_network", ip: $n3_ip1
+        n3.vm.network "private_network", ip: $n3_ip2, virtualbox__intnet: "remotenw"
+
+        n3.vm.provision :hosts do |hosts| 
+            hosts.add_host $n1_ip1, [$n1_host]
+            hosts.add_host $n2_ip1, [$n2_host]
+            hosts.add_host $n3_ip1, [$n3_host]
+        end
+
+        n3.vm.provision "shell", inline: "#{bootstrap}", privileged: true
+
+        n3.vm.provider "virtualbox" do |vbox|
+            vbox.memory=1024
+            vbox.cpus=1
+        end
+    end    
 end
