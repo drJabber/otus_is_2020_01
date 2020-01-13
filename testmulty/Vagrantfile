@@ -14,6 +14,15 @@ $n3_host="node3.local"
 
 bootstrap = <<SCRIPT
   useradd -m testuser1; echo -e "testtest\ntesttest" | passwd testuser1
+  
+  echo enable psychotic repo
+  rpm --import http://wiki.psychotic.ninja/RPM-GPG-KEY-psychotic
+
+  echo install psychotic package
+  rpm -ivh http://packages.psychotic.ninja/7/base/x86_64/RPMS/psychotic-release-1.0.0-1.el7.psychotic.noarch.rpm
+
+  echo install keychain package using yum command
+  yum --enablerepo=psychotic -y install keychain
 SCRIPT
 
 Vagrant.configure("2") do |config|
