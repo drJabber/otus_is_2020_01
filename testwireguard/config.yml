@@ -1,0 +1,20 @@
+global:
+    box: 'centos/7'
+    cpus: 1
+    mem: 1024
+    name_pattern: 'node'
+    ip_pattern: '192.168.99.10'
+boxes:
+    node1:
+        box:
+    node2:
+        box:
+            networks:
+                remotenw: '172.16.99.102'
+    node3:
+        box:
+            networks:
+                remotenw: '172.16.99.103'
+    node4:
+        box:
+        

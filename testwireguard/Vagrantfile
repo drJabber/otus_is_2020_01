@@ -1,0 +1,66 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+VAGRANTFILE_API_VERSION=2
+
+CONFIG_FILE='config.yml'
+require='yaml'
+myRoot=File.dirname(__FILE__)
+
+if not Pathname(myRoot + "/" + CONFIG_FILE).exist?
+    fail "vagrant.yml not found"
+end
+
+vagrantCfg=YAML.load_file(myRoot + "/" + CONFIG_FILE)
+node_box=vagrantCfg['global']['box']||'centos/7'
+node_cpus=vagrantCfg['global']['cpus']||1
+node_mem=vagrantCfg['global']['mem']||1024
+
+node_name_pattern=vagrantCfg['global']['name_pattern']||'node'
+node_ip_pattern=vagrantCfg['global']['ip_pattern']||'192.168.254.'
+
+box_number=1
+
+
+Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
+
+    box_count=0
+
+    vagrantCfg['boxes'].each do |boxName, boxCfg|
+        box_count+=1
+    end    
+
+
+    vagrantCfg['boxes'].each do |boxName, boxCfg|
+        box_name="#{node_name_pattern}#{box_number}"
+        box_ip="#{node_ip_pattern}%d" % box_number
+        box_number+=1
+        bx=boxCfg['box']
+        config.vm.define box_name do |box|
+            box.vm.box=node_box
+            box.vm.hostname=box_name+'.local'
+            box.vm.network :private_network, ip: box_ip
+
+            if (!bx.nil?) && (bx.has_key?'networks')
+                boxCfg['box']['networks'].each do |network_name, network_ip|
+                    box.vm.network :private_network, ip: network_ip, virtualbox__intnet: network_name
+                end
+            end
+
+            box.vm.provision :hosts do |hosts|
+                (1..box_count).each do |i|
+                    hosts.add_host node_ip_pattern+"#{i}", [node_name_pattern+"#{i}.local"]
+                end
+            end
+
+            box.vm.provision 'shell', path: "setupssh.sh", privileged: true
+
+            box.vm.provider "virtualbox" do |vbox|
+                vbox.memory=node_mem
+                vbox.cpus=node_cpus
+            end
+        end
+
+    end
+end                
+
