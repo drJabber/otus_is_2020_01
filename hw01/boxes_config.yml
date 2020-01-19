@@ -1,0 +1,12 @@
+global:
+    cpus: 2
+    mem: 2048
+    ip_pattern: '192.168.99.10'
+boxes:
+    nodevictim:
+        box:
+            box: 'centos/7'
+    nodeintruder:
+        box:
+            box: 'Dart-Sec/Kali-Linux-2019.3'
+        
