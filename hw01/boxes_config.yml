@@ -8,5 +8,5 @@ boxes:
             box: 'centos/7'
     nodeintruder:
         box:
-            box: 'Dart-Sec/Kali-Linux-2019.3'
+            box: 'kalilinux/rolling'
         
