@@ -6,7 +6,12 @@ boxes:
     nodevictim:
         box:
             box: 'centos/7'
+            default_root: 'vagrant'
+
     nodeintruder:
         box:
             box: 'kalilinux/rolling'
+            default_root: 'kali'
+
+
         

@@ -18,7 +18,6 @@ node_ip_pattern=vagrantCfg['global']['ip_pattern']||'192.168.254.'
 
 box_number=1
 
-
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     box_count=0
@@ -27,16 +26,33 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
         box_count+=1
     end    
 
+    hostList=Hash.new
+
+    vagrantCfg['boxes'].each do |boxName, boxCfg|
+        host_name=boxName#+'.local'
+        host_ip="#{node_ip_pattern}%d" % box_number
+        hostList[boxName]={'host'=>host_name,'ip'=>host_ip}
+        box_number+=1
+    end    
 
     vagrantCfg['boxes'].each do |boxName, boxCfg|
         box_name=boxName
-        box_ip="#{node_ip_pattern}%d" % box_number
-        box_number+=1
+        host_name=hostList[boxName]['host']
+        host_ip=hostList[boxName]['ip']
         bx=boxCfg['box']
         config.vm.define box_name do |box|
             box.vm.box=bx['box']
-            box.vm.hostname=box_name+'.local'
-            box.vm.network :private_network, ip: box_ip
+            box.vm.hostname=host_name
+            box.vm.network :private_network, ip: host_ip
+
+            box.vm.provision "shell", path: "bootstrap.sh", privileged: true, args: "#{bx['default_root']}"
+
+            box.vm.provision :hosts do |hosts|
+                hostList.each do |host_name, host_item|
+                    hosts.add_host host_item['ip'], [host_item['host']]
+                end
+            end        
+
 
             box.vm.provider "virtualbox" do |vbox|
                 vbox.memory=node_mem
