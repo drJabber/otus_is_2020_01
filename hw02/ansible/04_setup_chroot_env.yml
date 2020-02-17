@@ -1,0 +1,12 @@
+- name: exec chroot script to remote
+  script:
+    cmd: chroot/make_chroot.sh {{ chroot_dir }} /bin/{ls,echo,cat,rm,bash,mkdir,touch} /usr/bin/vi /etc/hosts
+
+- name: Insert/Update "Match User" configuration block in /etc/ssh/sshd_config
+  blockinfile:
+    path: /etc/ssh/sshd_config
+    block: |
+        Match User {{ chroot_user }}
+            ChrootDirectory {{ chroot_dir }}
+
+

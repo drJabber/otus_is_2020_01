@@ -1,0 +1,23 @@
+- name: add test user 1 
+  user: 
+    name: otus
+    password: "{{ password1 }}"
+    shell: /bin/bash
+    createhome: yes
+    append: yes
+
+- name: add test user 2
+  user: 
+    name: otus2
+    password: "{{ password2 }}"
+    shell: /bin/bash
+    createhome: yes
+    append: yes
+  
+- name: add test user 3
+  user: 
+    name: otus3
+    password: "{{ password3 }}"
+    shell: /bin/bash
+    createhome: yes
+    append: yes
