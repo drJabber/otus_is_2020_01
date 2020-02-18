@@ -58,7 +58,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                         puts "add sata 2nd time #{box_name}"
                         vbox.customize ['createmedium', '--filename', bx['vdi_file'], '--size', bx['vdi_size'] * 1024]
                         vbox.customize ["storagectl", :id, "--name", "SATA Controller", "--add", "sata" ]
-                        vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 0, '--type', 'hdd', '--medium',  bx['vdi_file']]
+                        vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 1, '--type', 'hdd', '--medium',  bx['vdi_file']]
                     end  
                 end
             end
