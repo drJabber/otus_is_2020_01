@@ -16,6 +16,20 @@ node_ip_pattern=vagrantCfg['global']['ip_pattern']||'192.168.254.'
 
 box_number=1
 
+def sata_controller_exists?(vm_name, controller_name="SATA Controller")
+    `vboxmanage showvminfo #{vm_name} | grep " #{controller_name}" | wc -l`.to_i == 1
+end
+
+def port_in_use?(vm_name, controller_name, port)
+    `vboxmanage showvminfo  #{vm_name} | grep "#{controller_name} (#{port}, " | wc -l`.to_i == 1
+end
+
+def attach_hdd(v, box_name,controller_name, port, hdd_path)
+    unless port_in_use?(box_name, controller_name, port)
+      v.customize ['storageattach', :id, '--storagectl', controller_name, '--port', port, '--device', 0, '--type', 'hdd', '--medium', hdd_path]
+    end
+end
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     box_count=0
@@ -46,6 +60,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             box.vm.box=bx['box']
             box.vm.hostname=host_name
             box.vm.network :private_network, ip: host_ip
+            box.newdisk.size=bx['vdi_size']
+            box.newdisk.path=bx['vdi_file']
 
             #setup HW props of provide
             node_cpus=bx['cpus']||1
@@ -53,14 +69,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             box.vm.provider "virtualbox" do |vbox|
                 vbox.memory=node_mem
                 vbox.cpus=node_cpus
-                if bx.key?('vdi_file')                
-                    unless File.exist?(bx['vdi_file'])
-                        puts "add sata 2nd time #{box_name}"
-                        vbox.customize ['createmedium', '--filename', bx['vdi_file'], '--size', bx['vdi_size'] * 1024]
-                        vbox.customize ["storagectl", :id, "--name", "SATA Controller", "--add", "sata" ]
-                        vbox.customize ['storageattach', :id, '--storagectl', 'SATA Controller', '--port', 1, '--device', 1, '--type', 'hdd', '--medium',  bx['vdi_file']]
-                    end  
-                end
             end
 
             #provision with bootstrap.sh shell script

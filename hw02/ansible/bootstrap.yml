@@ -23,7 +23,7 @@
   - include: 02_setup_polkit_rules.yml 
   - include: 03_setup_users.yml 
   - include: 04_setup_chroot_env.yml
-     
+  - include: 05_setup_pamd_policy.yml
 
 
 

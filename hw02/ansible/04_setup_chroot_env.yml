@@ -17,12 +17,6 @@
     # owner: '{{ chroot_user }}'
     # group: otus
           
-- name: Set authorized key taken from file
-  authorized_key:
-    user: '{{ chroot_user }}'
-    state: present
-    key: "{{ lookup('file', 'ssh/otus3_key.pub') }}"
-
 - name: Set PATH in environment
   lineinfile: 
     dest: '{{ chroot_dir }}/home/otus3/environment'
@@ -52,4 +46,9 @@
     # mode: 0644
     # owner: '{{ chroot_user }}'
     # group: otus
-    line: 'export PATH=/bin;/usr/bin'            
+    line: 'export PATH=/bin;/usr/bin'   
+    
+- name: restart sshd
+  service:
+    name: sshd
+    state: restarted

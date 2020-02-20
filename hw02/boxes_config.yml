@@ -9,7 +9,8 @@ boxes:
             cpus: 1
             mem: 256
             vdi_file: './sata_v.vdi'
-            vdi_size: 5
+            vdi_guid: 'd11eb682-df21-4a63-9864-47fae2958b5e'
+            vdi_size: 2
 
     nodeintruder:
         box:

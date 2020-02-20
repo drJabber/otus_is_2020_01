@@ -14,7 +14,7 @@ for i in $( ldd ${@:2} | grep -v dynamic | cut -d " " -f 3 | sed 's/://' | sort 
     cp --parents $i $CHROOT
   done
 
-# ARCH amd64
+# amd64
 if [ -f /lib64/ld-linux-x86-64.so.2 ]; then
    cp --parents /lib64/ld-linux-x86-64.so.2 /$CHROOT
 fi
