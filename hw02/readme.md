@@ -4,11 +4,11 @@
 ДЗ 2 - polkit, chtoot, pamd, apparmor
 -----------------------------------------------
 
-Создаем 2 витруальные машины. 
+Создаем [vagrantfile](https://github.com/drJabber/otus_is_2020_01/blob/master/hw02/Vagrantfile) под 2 витруальные машины. 
 1. на основе образа Centos/7 (nodevictim, ip 192.168.99.101)
 2. на основе образа ubuntu (nodeintruder, ip 192.168.99.102)
 
-Конфиги для vm задаются в файле boxes_config.yml
+Конфиги для vm задаются в файле [boxes_config.yml](https://github.com/drJabber/otus_is_2020_01/blob/master/hw02/boxes_config.yml)
 К vm nodevictim поключается виртуальный диск sata_v.vdi с помощью плагина vagrant-newdisk (необходимо установить) как /dev/sdb
 На стадии provivion в файлы /etc/hosts прописываются ip:hostname обеих машин. Используется плагин vagrant-hosts
 На стадии provision в каждой плейбуком ansible на vm nodevictim производятся следующие действия:
