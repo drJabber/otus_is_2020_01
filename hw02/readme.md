@@ -6,7 +6,7 @@
 
 Создаем [vagrantfile](https://github.com/drJabber/otus_is_2020_01/blob/master/hw02/Vagrantfile) под 2 витруальные машины. 
 1. на основе образа Centos/7 (nodevictim, ip 192.168.99.101)
-2. на основе образа ubuntu (nodeintruder, ip 192.168.99.102)
+2. на основе образа ubuntu (nodebuntu, ip 192.168.99.102)
 
 Конфиги для vm задаются в файле [boxes_config.yml](https://github.com/drJabber/otus_is_2020_01/blob/master/hw02/boxes_config.yml)
 К vm nodevictim поключается виртуальный диск sata_v.vdi с помощью плагина vagrant-newdisk (необходимо установить) как /dev/sdb
@@ -17,3 +17,14 @@
 3. Создается группа otus и пользователи otus, otus2, otus3 в этой группе с паролем vic!!vak, для пользователей копируются открытые ключи из [папки ansible/ssh](https://github.com/drJabber/otus_is_2020_01/tree/master/hw02/ansible/nodevictim/ssh)
 4. Создается ограниченное chroot-окружение [скриптом ansible/chroot/make_chroot.sh](https://github.com/drJabber/otus_is_2020_01/blob/master/hw02/ansible/nodevictim/chroot/make_chroot.sh), в sshd_config прописывается использование chroot-окружения для пользователя otus3
 5. Создается pam.d политика, которая запрещает пользователю otus2 вход через ssh. в pam.d в конфиге sshd создается запись, которая строго положительного ответа от модуля pam_time.so, в конфиге time.conf создается запись, которая запрещает пользователю otus2 любые действия 24/7
+
+Проверка выполнения задания:
+1. polkit:
+- ssh -i ./ansible/nodevictim/ssh/otus3_key otus@192.168.99.101 //зашли пользователем otus на vm nodevictim
+- udisksctl mount -b /dev/sdb1    // /dev/sdb1 монтируется в папку /run/media/otus/<some uuid>
+
+2. chroot
+- ssh -i ./ansible/nodevictim/ssh/otus3_key otus3@192.168.99.101 //зашли пользователем otus на vm nodevictim - попадаем с chroot directori, видим только то, что в /var/chroot/otus
+
+3. pamd
+- ssh -i ./ansible/nodevictim/ssh/otus3_key otus2@192.168.99.101  //пытаемся зайти пользователем otus2 на vm nodevictim - получаем connection closed

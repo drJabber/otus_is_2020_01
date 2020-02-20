@@ -6,7 +6,7 @@
     - password2: '$1$otus2$MJ7TrWnDWc4oHQ8S.dv3k0'
     - password3: '$1$otus3$aPFnydto.zF7lp8DxS9350'
     - rules_dir: '/etc/polkit-1/rules.d'
-    - rule_to_allow_mount_for_otus111: './polkit/10-mount-sdb1-for-user-otus.rules'
+    - rule_to_allow_mount_for_otus: 'polkit/10-mount-sdb1-for-user-otus.rules'
     - chroot_dir: '/var/chroot/otus3'
     - chroot_user: 'otus3'
  

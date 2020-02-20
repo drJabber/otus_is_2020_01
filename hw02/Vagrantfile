@@ -60,8 +60,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             box.vm.box=bx['box']
             box.vm.hostname=host_name
             box.vm.network :private_network, ip: host_ip
-            box.newdisk.size=bx['vdi_size']
-            box.newdisk.path=bx['vdi_file']
+
+            if bx['vdi_file']
+                box.newdisk.size=bx['vdi_size']
+                box.newdisk.path=bx['vdi_file']
+            end
 
             #setup HW props of provide
             node_cpus=bx['cpus']||1
