@@ -71,10 +71,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                 vbox.cpus=node_cpus
             end
 
-            #provision with bootstrap.sh shell script
-            #box.vm.provision "shell", path: "bootstrap.sh", privileged: true, args: "#{bx['default_root']}"
+            #provision with ansible playbook
             box.vm.provision "ansible" do |ansible|
-                ansible.playbook="ansible/bootstrap.yml"
+                ansible.playbook=bx["playbook"]
                 ansible.become=true
             end    
 

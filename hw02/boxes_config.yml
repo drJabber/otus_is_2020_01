@@ -5,22 +5,30 @@ boxes:
         box:
             box: 'centos/7'
             default_root: 'vagrant'
-
             cpus: 1
             mem: 256
             vdi_file: './sata_v.vdi'
-            vdi_guid: 'd11eb682-df21-4a63-9864-47fae2958b5e'
-            vdi_size: 2
-
-    nodeintruder:
+            vdi_size: 20
+            playbook: 'ansible/nodevictim/bootstrap.yml'
+        
+    nodebuntu:
         box:
-            box: 'kalilinux/rolling'
-            default_root: 'kali'
+            box: 'ubuntu/bionic64'
+            cpus: 1
+            mem: 256
+            playbook: 'ansible/nodebuntu/bootstrap.yml'
 
-            cpus: 2
-            mem: 2048
-#            vdi_file: './sata_i.vdi'
-#            vdi_size: 500
+
+
+#     nodeintruder:
+#         box:
+#             box: 'kalilinux/rolling'
+#             default_root: 'kali'
+
+#             cpus: 2
+#             mem: 2048
+# #            vdi_file: './sata_i.vdi'
+# #            vdi_size: 500
 
 
         

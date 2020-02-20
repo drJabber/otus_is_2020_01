@@ -14,7 +14,7 @@
 
     - name: copy polkit rule to rules.d dir
       copy:
-        src: "{{ rule_to_allow_mount_for_otus111 }}"
+        src: "{{ rule_to_allow_mount_for_otus }}"
         dest: "{{ rules_dir }}"
         owner: root
         group: root

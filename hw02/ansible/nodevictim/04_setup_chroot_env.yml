@@ -13,8 +13,8 @@
   file:
     path: '{{chroot_dir}}/home/{{ chroot_user }}'
     state: directory
-    # mode: 0644
-    # owner: '{{ chroot_user }}'
+    mode: 0755
+    owner: '{{ chroot_user }}'
     # group: otus
           
 - name: Set PATH in environment

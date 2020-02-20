@@ -1,0 +1,16 @@
+---
+- hosts: all
+  remote_user: root
+ 
+  tasks:
+  - name: install audit (for selinux, didn't installed by default in centos image), udisks2 (for lab), mc (for me)
+    yum:
+      name: 
+        - mc
+      state: present
+
+
+
+
+          
+      
