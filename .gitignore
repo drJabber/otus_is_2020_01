@@ -5,3 +5,4 @@ trash/
 test/
 *.box
 *.vdi
+*.log

@@ -6,6 +6,12 @@
     - password2: '$1$otus2$MJ7TrWnDWc4oHQ8S.dv3k0'
     - password3: '$1$otus3$aPFnydto.zF7lp8DxS9350'
 
+    - create_containers: 1
+#     - default_container_name: docker
+    - default_container_image: nginx
+#     - default_container_command: sleep 1d
+
+
   tasks:
   - name: Enable universe repository
     apt_repository:
@@ -15,14 +21,23 @@
       - "deb http://archive.ubuntu.com/ubuntu/ bionic-updates universe"
       - "deb http://security.ubuntu.com/ubuntu/ bionic-security universe"  
 
-  - name: install nginx, mc
+  - name: install nginx, mc,apparmor-utils
     apt:
       name: 
         - mc
-        - nginx
+        - docker
+        - apparmor-utils
+        - apparmor-profiles
       state: present
 
   - include: 03_setup_users.yml 
+  - include: 04-docker.yml
+
+  - name: start apparmor
+    service:
+      name: apparmor
+      state: started
+
 
 
 

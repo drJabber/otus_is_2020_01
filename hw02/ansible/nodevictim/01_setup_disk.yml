@@ -16,6 +16,9 @@
 
     - name: create filesystem on /dev/sdb1
       filesystem:
-        fstype: ext4 
+        fstype: ext3 
         dev: /dev/sdb1
+        force: yes
+      #become_user: otus
+        #opts: '-E root_uid=otus,root_gid=otus' 
 
