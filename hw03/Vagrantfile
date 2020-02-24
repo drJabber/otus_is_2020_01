@@ -44,14 +44,24 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
         #define box and setup some props
         config.vm.define box_name do |box|
+            box.vm.boot_timeout=600
             box.vm.box=bx['box']
+            
+            if bx['auto_update']!=nil
+                box.vbguest.auto_update = bx['auto_update']
+            end
+
+            if bx['box_version']
+                box.vm.box_version=bx['box_version']
+            end     
+
             box.vm.hostname=host_name
             box.vm.network :private_network, ip: host_ip
 
-            if bx['vdi_file']
-                box.newdisk.size=bx['vdi_size']
-                box.newdisk.path=bx['vdi_file']
-            end
+            # if bx['vdi_file']
+            #     box.newdisk.size=bx['vdi_size']
+            #     box.newdisk.path=bx['vdi_file']
+            # end
 
             #setup HW props of provide
             node_cpus=bx['cpus']||1
@@ -62,9 +72,11 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             end
 
             #provision with ansible playbook
-            box.vm.provision "ansible" do |ansible|
-                ansible.playbook=bx["playbook"]
-                ansible.become=true
+            if bx['playbook']
+                box.vm.provision "ansible" do |ansible|
+                    ansible.playbook=bx["playbook"]
+                    ansible.become=true
+                end    
             end    
 
             #provision with hosts plugin - add all hosts from list to /etc/hosts

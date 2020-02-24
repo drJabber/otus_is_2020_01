@@ -1,0 +1,24 @@
+    - name: check if /dev/sdb1 exists
+      parted: device=/dev/sdb
+        # become: yes
+      register: sdb_info
+
+    # - name: output sdb_info
+    #   debug: msg={{sdb_info}}
+
+    - name: create partition if not exists
+      parted: 
+        device: /dev/sdb
+        number: 1
+        state: present
+        # become: yes
+      when: sdb_info.partitions[0] is not defined
+
+    - name: create filesystem on /dev/sdb1
+      filesystem:
+        fstype: ext3 
+        dev: /dev/sdb1
+        force: yes
+      #become_user: otus
+        #opts: '-E root_uid=otus,root_gid=otus' 
+
