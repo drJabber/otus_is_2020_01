@@ -7,6 +7,10 @@
 1. Centos
 2. Ubuntu
 3. Metasploit
+- использовал материалы
+https://www.offensive-security.com/metasploit-unleashed/scanner-ssh-auxiliary-modules/
+https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit-suggester-0199463/
+
 в vagrantfile плейбуками ansible 
 - поднимаем уязвимую vm nodebuntu на ubuntu 16.04 с ядром 4.4.0-42 (nodebuntu/bootstrap.yml), ip 192.168.99.102
 - создаем на vm nodebuntu пользователя otus с обычными правами и паролем vic!!vak
