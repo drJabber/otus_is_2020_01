@@ -67,6 +67,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             node_cpus=bx['cpus']||1
             node_mem=bx['mem']||256
             box.vm.provider "virtualbox" do |vbox|
+                vbox.gui=false
                 vbox.memory=node_mem
                 vbox.cpus=node_cpus
             end
