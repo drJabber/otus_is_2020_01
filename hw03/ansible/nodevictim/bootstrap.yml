@@ -35,6 +35,12 @@
   - name: compile exploit
     command: 'gcc -pthread /home/otus/cowroot.c -o /home/otus/dirty'
 
+  - name: disable selinux
+    selinux: 
+      policy: targeted
+      state: permissive 
+
+
   # - include: 01_setup_disk.yml 
   # - include: 02_setup_polkit_rules.yml 
   # - include: 04_setup_chroot_env.yml
