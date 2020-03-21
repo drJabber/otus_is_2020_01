@@ -1,0 +1,11 @@
+- name: clone git repo for wekan docker-compose.yml
+  git:
+    clone: yes
+    repo: 'https://github.com/wekan/wekan-mongodb.git'
+    dest: ~/wekan
+  become: no      
+
+# - name: start wekan container
+#   docker_compose: 
+#     project_src: wekan
+#     state: present

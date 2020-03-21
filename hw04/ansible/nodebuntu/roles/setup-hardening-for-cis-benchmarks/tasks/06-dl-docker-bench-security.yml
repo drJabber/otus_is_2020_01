@@ -1,0 +1,6 @@
+- name: clone git repo for docker-bench-security
+  git:
+    clone: yes
+    repo: 'https://github.com/docker/docker-bench-security.git'
+    dest: ~/docker-bench-security
+  become: no    

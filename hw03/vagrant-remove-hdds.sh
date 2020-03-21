@@ -1,5 +1,5 @@
 
-export GUEST=oln7rac12c00xxx
+export GUEST=testwirequard_node4
 vboxmanage list hdds | sed -e '/./{H;$!d;}' -e 'x;/'"$GUEST"'/!d;' | grep UUID | egrep -v Parent| awk '{print $2}'
 
 vboxmanage list hdds | sed -e '/./{H;$!d;}' -e 'x;/'"$GUEST"'/!d;'

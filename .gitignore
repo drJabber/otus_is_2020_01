@@ -3,6 +3,7 @@
 vagrant/
 trash/
 test/
+wekan-mongodb/
 *.box
 *.vdi
 *.log
