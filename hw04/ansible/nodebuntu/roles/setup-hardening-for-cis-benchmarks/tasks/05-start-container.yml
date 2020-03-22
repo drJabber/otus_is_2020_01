@@ -1,0 +1,28 @@
+- name: copy webapp-simple image to remote
+  copy:
+      src: ./server-app/webapp-simple.zip
+      dest: .
+      
+- name: add user vagrant to group docker
+  user:
+    name: vagrant
+    groups: docker
+
+- name: Load image from archive 
+  docker_image:
+    name: webapp-simple-image
+    load_path: ./webapp-simple.zip
+    source: load
+    force_source: yes
+    state: present
+    validate_certs: yes
+    tls_hostname: "tcp://192.168.99.101:2376"
+
+- name: start container
+  docker_container:
+    name: webapp-simple
+    image: webapp-simple-image
+    state: started
+    restart: yes
+    ports:
+      - "127.0.0.1:8188:80"

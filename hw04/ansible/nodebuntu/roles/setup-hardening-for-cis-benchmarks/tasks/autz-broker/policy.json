@@ -1,2 +1,2 @@
-{    "name":"policy1",    "users":["otus"],    "actions":[""]}
-{    "name":"policy2",    "users":[""],    "actions":["version"],    "readonly":true}
+{    "name":"policy1",    "users":["client"],    "actions":[""]}
+{    "name":"policy2",    "users":[""],    "actions":[""]}

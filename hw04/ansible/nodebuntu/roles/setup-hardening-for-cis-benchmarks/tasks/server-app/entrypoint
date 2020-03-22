@@ -1,0 +1,5 @@
+#!/bin/bash
+
+ls -lha
+
+python3.7 ./signal_server.py
