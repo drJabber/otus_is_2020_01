@@ -19,3 +19,9 @@ COMMAND  PID USER   FD   TYPE DEVICE SIZE/OFF NODE NAME
 dockerd 7029 root    3u  IPv4 101700      0t0  TCP nodebuntu:2376 (LISTEN)
 
 
+создание образа docker: необходимо из директории 
+/home/djabber/projects/otus/IS/hw04/ansible/nodebuntu/roles/setup-hardening-for-cis-benchmarks/tasks/server-app
+выполнить скрит build.sh
+
+
+
