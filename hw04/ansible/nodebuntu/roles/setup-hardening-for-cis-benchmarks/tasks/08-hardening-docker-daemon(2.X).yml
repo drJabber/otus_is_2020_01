@@ -63,6 +63,15 @@
        export DOCKER_HOST=tcp://{{ docker_host }}:2376
        export DOCKER_CERT_PATH=~/.docker
           
+- name: set env vars for client
+  blockinfile:
+    path: /root/.profile
+    block: |
+      export DOCKER_CONTENT_TRUST=1
+      export DOCKER_TLS_VERIFY=1
+      export DOCKER_HOST=tcp://{{ docker_host }}:2376
+      export DOCKER_CERT_PATH=~/.docker
+               
 - name: set env vars for vagrant
   blockinfile:
     path: /home/vagrant/.bashrc
@@ -72,7 +81,15 @@
       export DOCKER_HOST=tcp://{{ docker_host }}:2376
       export DOCKER_CERT_PATH=~/.docker
           
-           
+- name: set env vars for vagrant
+  blockinfile:
+    path: /home/vagrant/.profile
+    block: |
+      export DOCKER_CONTENT_TRUST=1
+      export DOCKER_TLS_VERIFY=1
+      export DOCKER_HOST=tcp://{{ docker_host }}:2376
+      export DOCKER_CERT_PATH=~/.docker
+               
 - name: reload systemctl
   command: "systemctl daemon-reload"
 
