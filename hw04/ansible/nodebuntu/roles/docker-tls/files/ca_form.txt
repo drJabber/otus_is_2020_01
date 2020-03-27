@@ -1,7 +1,7 @@
 
-US
-North Carolina
-Durham
-Red Hat
-Ansible
+RU
+Novosibirsk
+Novosibirsk
+Ubuntu
+Qwerty
 

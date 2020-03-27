@@ -3,14 +3,15 @@
       src: ./server-app/webapp-simple.zip
       dest: .
       
-- name: add user vagrant to group docker
-  user:
-    name: vagrant
-    groups: docker
+# - name: add user vagrant to group docker
+#   user:
+#     name: vagrant
+#     groups: docker
 
 - name: Load image from archive 
   docker_image:
     name: webapp-simple-image
+    tag: 0.1
     load_path: ./webapp-simple.zip
     source: load
     force_source: yes
@@ -18,11 +19,29 @@
     validate_certs: yes
     tls_hostname: "tcp://192.168.99.101:2376"
 
+- name: create docker volume
+  docker_volume: 
+    name: data
+    recreate: never
+    # docker_host: "tcp://192.168.99.101:2376"
+    # validate_certs: yes
+    state: present
+
 - name: start container
   docker_container:
     name: webapp-simple
-    image: webapp-simple-image
+    image: "webapp-simple-image:0.1"
     state: started
     restart: yes
+    memory: 64m
+    cpu_shares: 128
+    read_only: yes
+    restart_policy: on-failure
+    restart_retries: 5
+    security_opts: 'no-new-privileges:true'
+    pids_limit: 50
+    volumes:
+      data:/run/app/data:rw
+      
     ports:
       - "127.0.0.1:8188:8188"

@@ -98,7 +98,7 @@ def get_args():
 def set_logger():
     handlers = []
 
-    log_file = 'signal_server.log'
+    log_file = '/run/app/data/signal_server.log'
     handlers.append(logging.FileHandler(log_file))
     handlers.append(logging.StreamHandler())
 
