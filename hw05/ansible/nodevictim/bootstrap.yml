@@ -1,0 +1,23 @@
+---
+- hosts: all
+
+  remote_user: vagrant
+  become: yes
+  
+  vars:
+    - password1: '$1$otus$H73n7J9kEP9Uu7qtgrOeY.'
+    - password2: '$1$otus2$MJ7TrWnDWc4oHQ8S.dv3k0'
+    - password3: '$1$otus3$aPFnydto.zF7lp8DxS9350'
+
+    - docker_host: '192.168.99.101'
+
+  roles:
+    - role: startup
+    - role: nginx
+
+
+
+
+
+          
+      
