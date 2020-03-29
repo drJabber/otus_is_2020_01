@@ -1,0 +1,11 @@
+- name: run docker_bench_security script
+  shell: 
+    cmd: './docker-bench-security.sh -l ../docker-bench-security.log || exit 1'
+    chdir: docker-bench-security 
+
+- name: run trivy
+  shell: 
+    cmd: 'trivy --no-progress webapp-simple-image:0.1 >trivy.log|| exit 1'
+
+
+

@@ -1,0 +1,17 @@
+- name: clone git repo for docker-bench-security
+  git:
+    clone: yes
+    repo: 'https://github.com/docker/docker-bench-security.git'
+    dest: ~/docker-bench-security
+  become: no
+
+
+- name: setup trivy
+  get_url: 
+    url: 'https://github.com/aquasecurity/trivy/releases/download/v0.5.3/trivy_0.5.3_Linux-64bit.deb'
+    dest: ./trivy.deb
+
+- name: setup trivy
+  apt: 
+    deb: './trivy.deb'
+  
