@@ -76,7 +76,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
                 ansible.become=true
                 ansible.extra_vars={"nginx_custom_port_selinux_mode" => nginx_custom_port_selinux_mode }
                 # ansible.config_file="ansible.cfg"
-                # ansible.verbose="-vv"
+                # ansible.verbose="-vvv"
             end    
 
             #provision with hosts plugin - add all hosts from list to /etc/hosts

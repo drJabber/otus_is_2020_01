@@ -1,13 +1,13 @@
 ---
 - name: check nginx works fine (curl http://localhost:{{ nginx_port }}/)
   block:  
-    - name: ooooooo  
+    - name: shell command curl  
       shell: 
         cmd: 'curl http://localhost:{{ nginx_port}}/'
         warn: no
       register: nginx_test_results
   rescue:
-    - name: zzzzz
+    - name: msg if failed
       shell: 
         cmd: 'echo "nginx test failed ({{ nginx_custom_port_selinux_mode }})"'
       register: nginx_test_results
@@ -15,6 +15,6 @@
   
 - name: output test result
   debug:
-    msg: "{{ nginx_test_results.stdout }} nginx test succeed ({{ nginx_custom_port_selinux_mode }})"
+    msg: "{{ nginx_test_results.stdout }}  ({{ nginx_custom_port_selinux_mode }})"
 
 
