@@ -16,6 +16,8 @@ node_ip_pattern=vagrantCfg['global']['ip_pattern']||'192.168.254.'
 
 box_number=1
 
+nginx_custom_port_selinux_mode=ENV['NGINX_CUSTOM_PORT_SELINUX_MODE']||'selinux_setsebool'
+
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
@@ -72,6 +74,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
             box.vm.provision "ansible" do |ansible|
                 ansible.playbook=bx["playbook"]
                 ansible.become=true
+                ansible.extra_vars={"nginx_custom_port_selinux_mode" => nginx_custom_port_selinux_mode }
+                # ansible.config_file="ansible.cfg"
+                # ansible.verbose="-vv"
             end    
 
             #provision with hosts plugin - add all hosts from list to /etc/hosts
