@@ -6,6 +6,7 @@
 
 Vagrantfile
 ------------
+* Для сведения: Использован плагин vagrant-hosts
 
 в vagrantfile поднимаем vm из образа centos/7 (nodevictim, ip 192.168.99.101)
 Далее плейбуками ansible (bootstrap.yml)
@@ -26,7 +27,7 @@ Vagrantfile
 - для выполнения запуска nginx в том или ином режиме используется переменная окружения NGINX_CUSTOM_PORT_SELINUX_MODE, возможные значения:
   selinux_setsebool - для изменения заначения флага selinux (nis_enabled)
   selinux_add_port_to_existing_type - для добавления нестандартного порта к имеющемуся типу (http_port_t)
-  selinux_add_module - для создания кастомного модуля 
+  selinux_semodule - для создания кастомного модуля 
 
 1. Разрешение запуска nginx на порту 8188, используя  переключатель setsebool (nis_enabled=1). 
    Для изменения значения флага используется роль selinux_setsebool. 
@@ -154,7 +155,7 @@ allow named_t etc_t : file { read write };
 
 - в named.conf в дазделах для ddns поменять директорию, где размещается файл зоны с /etc/named/dynamic на /var/named/dynamic (см поправленный файл /part_ii/selinux_dns_problems/files/ns01/named.conf )
 
-###Эпилог
+### Эпилог
 
 Инженер правит конфиг named, делает sudo vagrant destroy ns01 --force && sudo vagrant up ns01, с машины client выполняет тестовый кейс и наслаждается плодами своих трудов:
 ```bash
